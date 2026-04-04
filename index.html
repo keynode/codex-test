@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Китайский для детей: Еда</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>🐼 Китайский: тема «Еда»</h1>
+      <div class="progress">
+        <span>⭐ <strong id="starCount">0</strong></span>
+        <span>🏅 <strong id="badgeCount">0</strong></span>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="startScreen" class="card active">
+        <h2>Привет! Готов к уроку?</h2>
+        <p>Выучим слова про еду, поиграем и получим награды!</p>
+        <button id="startLessonBtn" class="primary">Начать урок</button>
+      </section>
+
+      <section id="wordsScreen" class="card hidden">
+        <h2>Слова дня</h2>
+        <p>Нажимай на 🔊, чтобы слушать произношение.</p>
+        <div id="wordGrid" class="word-grid"></div>
+        <button id="toQuizBtn" class="primary">Играть: выбери перевод</button>
+      </section>
+
+      <section id="quizScreen" class="card hidden">
+        <h2>Игра 1: выбери правильный перевод</h2>
+        <p id="quizPrompt"></p>
+        <div id="quizOptions" class="options"></div>
+        <p id="quizFeedback" class="feedback"></p>
+      </section>
+
+      <section id="fillScreen" class="card hidden">
+        <h2>Игра 2: вставь слова в предложение</h2>
+        <p>Выбери правильные слова для пропусков.</p>
+        <div id="fillContainer"></div>
+        <button id="checkFillBtn" class="primary">Проверить</button>
+        <p id="fillFeedback" class="feedback"></p>
+      </section>
+
+      <section id="resultScreen" class="card hidden">
+        <h2>Финал урока 🎉</h2>
+        <p id="resultText"></p>
+        <button id="restartBtn" class="primary">Пройти ещё раз</button>
+      </section>
+    </main>
+
+    <div id="rewardToast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
