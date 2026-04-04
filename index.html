@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chinese Lesson</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #root {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: linear-gradient(135deg, #fff5e4, #ffe3e3, #e8d5ff);
+        color: #2d3436;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      @keyframes blankPop {
+        0% {
+          transform: scale(1);
+        }
+        45% {
+          transform: scale(1.15);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes blankWrong {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-6px);
+        }
+        75% {
+          transform: translateX(6px);
+        }
+      }
+
+      @keyframes bounceIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.4);
+        }
+        55% {
+          opacity: 1;
+          transform: scale(1.15);
+        }
+        75% {
+          transform: scale(0.96);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes starSpin {
+        0% {
+          transform: scale(0) rotate(-180deg);
+        }
+        65% {
+          transform: scale(1.3) rotate(20deg);
+        }
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      @keyframes shakeX {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-12px);
+        }
+        40% {
+          transform: translateX(12px);
+        }
+        60% {
+          transform: translateX(-10px);
+        }
+        80% {
+          transform: translateX(10px);
+        }
+      }
+
+      @keyframes floatUp {
+        0% {
+          opacity: 0;
+          transform: translateY(0) scale(0.85);
+        }
+        20% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-260px) scale(1.18);
+        }
+      }
+
+      @keyframes cf0 {
+        0% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(-40px, 340px, 0) rotate(540deg);
+        }
+      }
+
+      @keyframes cf1 {
+        0% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(30px, 360px, 0) rotate(620deg);
+        }
+      }
+
+      @keyframes cf2 {
+        0% {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(0, 320px, 0) rotate(700deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useMemo, useRef, useEffect, useCallback } = React;
+
+      const ALL_LESSONS = [
+        {
+          id: "food",
+          title: "Еда 食物",
+          icon: "🍚",
+          color: "#FF6B6B",
+          vocabulary: [
+            { hanzi: "米饭", pinyin: "mǐfàn", ru: "рис", emoji: "🍚" },
+            { hanzi: "鸡蛋", pinyin: "jīdàn", ru: "яйцо", emoji: "🥚" },
+            { hanzi: "苹果", pinyin: "píngguǒ", ru: "яблоко", emoji: "🍎" },
+            { hanzi: "牛奶", pinyin: "niúnǎi", ru: "молоко", emoji: "🥛" },
+            { hanzi: "面包", pinyin: "miànbāo", ru: "хлеб", emoji: "🍞" },
+            { hanzi: "鱼", pinyin: "yú", ru: "рыба", emoji: "🐟" },
+            { hanzi: "水", pinyin: "shuǐ", ru: "вода", emoji: "💧" },
+            { hanzi: "汤", pinyin: "tāng", ru: "суп", emoji: "🍲" },
+            { hanzi: "肉", pinyin: "ròu", ru: "мясо", emoji: "🍖" },
+            { hanzi: "蔬菜", pinyin: "shūcài", ru: "овощи", emoji: "🥦" }
+          ],
+          exercises: [
+            {
+              hint: "Я люблю есть рис и рыбу.",
+              full: "我喜欢吃米饭和鱼。",
+              template: "我喜欢吃{米饭}和{鱼}。",
+              distractors: ["水", "汤"]
+            },
+            {
+              hint: "На завтрак я ем хлеб и яйцо.",
+              full: "早饭我吃面包和鸡蛋。",
+              template: "早饭我吃{面包}和{鸡蛋}。",
+              distractors: ["苹果", "肉"]
+            },
+            {
+              hint: "Я пью молоко и воду.",
+              full: "我喝牛奶和水。",
+              template: "我喝{牛奶}和{水}。",
+              distractors: ["鱼", "面包"]
+            },
+            {
+              hint: "Сегодня я ем овощи и мясо.",
+              full: "今天我吃蔬菜和肉。",
+              template: "今天我吃{蔬菜}和{肉}。",
+              distractors: ["汤", "苹果"]
+            },
+            {
+              hint: "Я люблю яблоко и суп.",
+              full: "我喜欢苹果和汤。",
+              template: "我喜欢{苹果}和{汤}。",
+              distractors: ["水", "鸡蛋"]
+            },
+            {
+              hint: "Рис, мясо и вода очень вкусные.",
+              full: "米饭、肉和水很好。",
+              template: "{米饭}、{肉}和{水}很好。",
+              distractors: ["面包", "牛奶"]
+            }
+          ]
+        },
+        {
+          id: "family",
+          title: "Семья 家人",
+          icon: "👨‍👩‍👧‍👦",
+          color: "#FF9F43",
+          vocabulary: [
+            { hanzi: "妈妈", pinyin: "māma", ru: "мама", emoji: "👩" },
+            { hanzi: "爸爸", pinyin: "bàba", ru: "папа", emoji: "👨" },
+            { hanzi: "哥哥", pinyin: "gēge", ru: "старший брат", emoji: "🧑" },
+            { hanzi: "姐姐", pinyin: "jiějie", ru: "старшая сестра", emoji: "👧" },
+            { hanzi: "弟弟", pinyin: "dìdi", ru: "младший брат", emoji: "👦" },
+            { hanzi: "妹妹", pinyin: "mèimei", ru: "младшая сестра", emoji: "🧒" },
+            { hanzi: "爷爷", pinyin: "yéye", ru: "дедушка", emoji: "👴" },
+            { hanzi: "奶奶", pinyin: "nǎinai", ru: "бабушка", emoji: "👵" },
+            { hanzi: "家", pinyin: "jiā", ru: "дом", emoji: "🏠" },
+            { hanzi: "爱", pinyin: "ài", ru: "любовь", emoji: "❤️" }
+          ],
+          exercises: [
+            {
+              hint: "Мама и папа дома.",
+              full: "妈妈和爸爸在家。",
+              template: "{妈妈}和{爸爸}在{家}。",
+              distractors: ["爱", "姐姐"]
+            },
+            {
+              hint: "Я люблю бабушку и дедушку.",
+              full: "我爱奶奶和爷爷。",
+              template: "我爱{奶奶}和{爷爷}。",
+              distractors: ["弟弟", "爸爸"]
+            },
+            {
+              hint: "У меня есть старший брат и старшая сестра.",
+              full: "我有哥哥和姐姐。",
+              template: "我有{哥哥}和{姐姐}。",
+              distractors: ["妹妹", "家"]
+            },
+            {
+              hint: "Младший брат и младшая сестра играют.",
+              full: "弟弟和妹妹玩。",
+              template: "{弟弟}和{妹妹}玩。",
+              distractors: ["妈妈", "爱"]
+            },
+            {
+              hint: "Наша семья полна любви.",
+              full: "我们家有爱。",
+              template: "我们{家}有{爱}。",
+              distractors: ["爷爷", "姐姐"]
+            },
+            {
+              hint: "Мама любит младшего брата.",
+              full: "妈妈爱弟弟。",
+              template: "{妈妈}爱{弟弟}。",
+              distractors: ["奶奶", "爸爸"]
+            }
+          ]
+        },
+        {
+          id: "animals",
+          title: "Животные 动物",
+          icon: "🐱",
+          color: "#6BCB77",
+          vocabulary: [
+            { hanzi: "猫", pinyin: "māo", ru: "кот", emoji: "🐱" },
+            { hanzi: "狗", pinyin: "gǒu", ru: "собака", emoji: "🐶" },
+            { hanzi: "鱼", pinyin: "yú", ru: "рыба", emoji: "🐟" },
+            { hanzi: "鸟", pinyin: "niǎo", ru: "птица", emoji: "🐦" },
+            { hanzi: "兔子", pinyin: "tùzi", ru: "кролик", emoji: "🐰" },
+            { hanzi: "马", pinyin: "mǎ", ru: "лошадь", emoji: "🐴" },
+            { hanzi: "牛", pinyin: "niú", ru: "корова", emoji: "🐮" },
+            { hanzi: "猪", pinyin: "zhū", ru: "свинья", emoji: "🐷" },
+            { hanzi: "龙", pinyin: "lóng", ru: "дракон", emoji: "🐉" },
+            { hanzi: "熊猫", pinyin: "xióngmāo", ru: "панда", emoji: "🐼" }
+          ],
+          exercises: [
+            {
+              hint: "Кот и собака мои друзья.",
+              full: "猫和狗是我的朋友。",
+              template: "{猫}和{狗}是我的朋友。",
+              distractors: ["鱼", "龙"]
+            },
+            {
+              hint: "Панда любит бамбук, а птица летает.",
+              full: "熊猫和鸟很好。",
+              template: "{熊猫}和{鸟}很好。",
+              distractors: ["猪", "牛"]
+            },
+            {
+              hint: "Кролик и лошадь бегут.",
+              full: "兔子和马跑。",
+              template: "{兔子}和{马}跑。",
+              distractors: ["猫", "鱼"]
+            },
+            {
+              hint: "Корова и свинья на ферме.",
+              full: "牛和猪在农场。",
+              template: "{牛}和{猪}在农场。",
+              distractors: ["鸟", "龙"]
+            },
+            {
+              hint: "Дракон и рыба в истории.",
+              full: "龙和鱼在故事里。",
+              template: "{龙}和{鱼}在故事里。",
+              distractors: ["狗", "马"]
+            },
+            {
+              hint: "Кот любит рыбу.",
+              full: "猫喜欢鱼。",
+              template: "{猫}喜欢{鱼}。",
+              distractors: ["熊猫", "猪"]
+            }
+          ]
+        },
+        {
+          id: "numbers",
+          title: "Числа 数字",
+          icon: "🔢",
+          color: "#4D96FF",
+          vocabulary: [
+            { hanzi: "一", pinyin: "yī", ru: "один", emoji: "1️⃣" },
+            { hanzi: "二", pinyin: "èr", ru: "два", emoji: "2️⃣" },
+            { hanzi: "三", pinyin: "sān", ru: "три", emoji: "3️⃣" },
+            { hanzi: "四", pinyin: "sì", ru: "четыре", emoji: "4️⃣" },
+            { hanzi: "五", pinyin: "wǔ", ru: "пять", emoji: "5️⃣" },
+            { hanzi: "六", pinyin: "liù", ru: "шесть", emoji: "6️⃣" },
+            { hanzi: "七", pinyin: "qī", ru: "семь", emoji: "7️⃣" },
+            { hanzi: "八", pinyin: "bā", ru: "восемь", emoji: "8️⃣" },
+            { hanzi: "九", pinyin: "jiǔ", ru: "девять", emoji: "9️⃣" },
+            { hanzi: "十", pinyin: "shí", ru: "десять", emoji: "🔟" }
+          ],
+          exercises: [
+            {
+              hint: "У меня одна кошка.",
+              full: "我有一只猫。",
+              template: "我有{一}只猫。",
+              distractors: ["三", "五"]
+            },
+            {
+              hint: "У него две книги.",
+              full: "他有两本书。",
+              template: "他有{二}本书。",
+              distractors: ["六", "八"]
+            },
+            {
+              hint: "Я вижу трёх птиц.",
+              full: "我看见三只鸟。",
+              template: "我看见{三}只鸟。",
+              distractors: ["一", "九"]
+            },
+            {
+              hint: "На столе четыре яблока.",
+              full: "桌子上有四个苹果。",
+              template: "桌子上有{四}个苹果。",
+              distractors: ["二", "七"]
+            },
+            {
+              hint: "У меня пять карандашей.",
+              full: "我有五支铅笔。",
+              template: "我有{五}支铅笔。",
+              distractors: ["三", "十"]
+            },
+            {
+              hint: "В классе десять учеников.",
+              full: "教室里有十个学生。",
+              template: "教室里有{十}个学生。",
+              distractors: ["四", "六"]
+            }
+          ]
+        },
+        {
+          id: "colors",
+          title: "Цвета 颜色",
+          icon: "🎨",
+          color: "#9B59B6",
+          vocabulary: [
+            { hanzi: "红色", pinyin: "hóngsè", ru: "красный", emoji: "❤️" },
+            { hanzi: "蓝色", pinyin: "lánsè", ru: "синий", emoji: "🫐" },
+            { hanzi: "绿色", pinyin: "lǜsè", ru: "зелёный", emoji: "🍀" },
+            { hanzi: "黄色", pinyin: "huángsè", ru: "жёлтый", emoji: "🌟" },
+            { hanzi: "白色", pinyin: "báisè", ru: "белый", emoji: "⚪" },
+            { hanzi: "黑色", pinyin: "hēisè", ru: "чёрный", emoji: "⚫" },
+            { hanzi: "紫色", pinyin: "zǐsè", ru: "фиолетовый", emoji: "🍇" },
+            { hanzi: "橙色", pinyin: "chéngsè", ru: "оранжевый", emoji: "🍊" },
+            { hanzi: "粉色", pinyin: "fěnsè", ru: "розовый", emoji: "🌸" },
+            { hanzi: "灰色", pinyin: "huīsè", ru: "серый", emoji: "🪨" }
+          ],
+          exercises: [
+            {
+              hint: "Красный и синий.",
+              full: "红色和蓝色。",
+              template: "{红色}和{蓝色}。",
+              distractors: ["白色", "灰色"]
+            },
+            {
+              hint: "Зелёный и жёлтый.",
+              full: "绿色和黄色。",
+              template: "{绿色}和{黄色}。",
+              distractors: ["黑色", "粉色"]
+            },
+            {
+              hint: "Белый и чёрный.",
+              full: "白色和黑色。",
+              template: "{白色}和{黑色}。",
+              distractors: ["蓝色", "橙色"]
+            },
+            {
+              hint: "Фиолетовый и оранжевый.",
+              full: "紫色和橙色。",
+              template: "{紫色}和{橙色}。",
+              distractors: ["红色", "绿色"]
+            },
+            {
+              hint: "Розовый и серый.",
+              full: "粉色和灰色。",
+              template: "{粉色}和{灰色}。",
+              distractors: ["白色", "黄色"]
+            },
+            {
+              hint: "Красный, жёлтый и синий.",
+              full: "红色、黄色和蓝色。",
+              template: "{红色}、{黄色}和{蓝色}。",
+              distractors: ["黑色", "灰色"]
+            }
+          ]
+        }
+      ];
+
+      const TOKENS = {
+        pageBg: "linear-gradient(135deg, #FFF5E4, #FFE3E3, #E8D5FF)",
+        text: "#2D3436",
+        gray: "#636E72",
+        softGray: "#888",
+        blue: "#4D96FF",
+        green: "#6BCB77",
+        red: "#FF6B6B",
+        yellow: "#FFD93D",
+        cardRadius: 24,
+        btnRadius: 16,
+        chipRadius: 14,
+        shadow: "0 14px 30px rgba(149, 117, 205, 0.18)"
+      };
+
+      function shuffle(items) {
+        const cloned = [...items];
+        for (let index = cloned.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [cloned[index], cloned[swapIndex]] = [cloned[swapIndex], cloned[index]];
+        }
+        return cloned;
+      }
+
+      function parseTemplate(template) {
+        const re = /\{([^}]+)\}/g;
+        const parts = [];
+        const answers = [];
+        let lastIndex = 0;
+        let match;
+
+        while ((match = re.exec(template)) !== null) {
+          parts.push(template.slice(lastIndex, match.index));
+          parts.push(null);
+          answers.push(match[1]);
+          lastIndex = re.lastIndex;
+        }
+
+        parts.push(template.slice(lastIndex));
+        return { parts, answers };
+      }
+
+      function lessonToJSON(lesson) {
+        return JSON.stringify(lesson, null, 2);
+      }
+
+      function getAudioCtx() {
+        if (!window.__lessonAudioCtx) {
+          const AudioContextRef = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextRef) {
+            return null;
+          }
+          window.__lessonAudioCtx = new AudioContextRef();
+        }
+
+        if (window.__lessonAudioCtx.state === "suspended") {
+          window.__lessonAudioCtx.resume();
+        }
+
+        return window.__lessonAudioCtx;
+      }
+
+      function playTone(freq, duration, type = "sine", gainValue = 0.12, delay = 0) {
+        const ctx = getAudioCtx();
+        if (!ctx) {
+          return;
+        }
+
+        const now = ctx.currentTime + delay;
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(gainValue, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.start(now);
+        oscillator.stop(now + duration);
+      }
+
+      function playClick() {
+        playTone(880, 0.08, "sine", 0.12);
+      }
+
+      function playSuccess() {
+        [523, 659, 784, 1047].forEach((freq, index) => {
+          playTone(freq, 0.25, "triangle", 0.12, index * 0.12);
+        });
+      }
+
+      function playWrong() {
+        playTone(300, 0.2, "square", 0.1, 0);
+        playTone(220, 0.3, "square", 0.1, 0.15);
+      }
+
+      function playStarSparkle() {
+        [800, 1000, 1200, 1400, 1600].forEach((freq, index) => {
+          playTone(freq, 0.12, "sine", 0.08, index * 0.06);
+        });
+      }
+
+      function speakChinese(text) {
+        if (!text) {
+          return;
+        }
+
+        const encoded = encodeURIComponent(text);
+        const audio = new Audio(
+          `https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&client=tw-ob&q=${encoded}`
+        );
+
+        audio.play().catch(() => {
+          if (!("speechSynthesis" in window)) {
+            return;
+          }
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "zh-CN";
+          utterance.rate = 0.8;
+          const voices = window.speechSynthesis.getVoices();
+          const zhVoice = voices.find((voice) => voice.lang && voice.lang.toLowerCase().includes("zh"));
+          if (zhVoice) {
+            utterance.voice = zhVoice;
+          }
+          window.speechSynthesis.speak(utterance);
+        });
+      }
+
+      function stopEvent(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      function SpeakBtn({ text, small = false }) {
+        const [playing, setPlaying] = useState(false);
+
+        function onSpeak(event) {
+          stopEvent(event);
+          playClick();
+          setPlaying(true);
+          speakChinese(text);
+          window.setTimeout(() => setPlaying(false), 1500);
+        }
+
+        return (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={onSpeak}
+            onMouseDown={stopEvent}
+            onPointerDown={stopEvent}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                onSpeak(event);
+              }
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: small ? 24 : 28,
+              height: small ? 24 : 28,
+              marginLeft: 6,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.24)",
+              color: "inherit",
+              cursor: "pointer",
+              transform: playing ? "scale(1.3)" : "scale(1)",
+              transition: "transform 0.18s ease",
+              userSelect: "none",
+              fontSize: small ? 12 : 14
+            }}
+          >
+            🔊
+          </span>
+        );
+      }
+
+      function ConfettiBurst({ burstKey }) {
+        const colors = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#A66CFF", "#FF9F43", "#FF8DC7", "#8BE9FD"];
+        const particles = Array.from({ length: 60 }, (_, index) => {
+          const shapeCircle = Math.random() > 0.5;
+          return {
+            id: `${burstKey}-${index}`,
+            left: `${10 + Math.random() * 80}%`,
+            top: `${4 + Math.random() * 14}%`,
+            size: 6 + Math.random() * 10,
+            color: colors[index % colors.length],
+            delay: Math.random() * 0.8,
+            duration: 1.8 + Math.random() * 1.2,
+            anim: `cf${index % 3}`
+          };
+        });
+
+        return (
+          <div style={{ pointerEvents: "none", position: "fixed", inset: 0, overflow: "hidden", zIndex: 40 }}>
+            {particles.map((particle) => (
+              <span
+                key={particle.id}
+                style={{
+                  position: "absolute",
+                  left: particle.left,
+                  top: particle.top,
+                  width: particle.size,
+                  height: particle.size,
+                  background: particle.color,
+                  borderRadius: particle.id.endsWith("1") || particle.id.endsWith("5") ? "50%" : 3,
+                  animation: `${particle.anim} ${particle.duration}s ease-out ${particle.delay}s forwards`
+                }}
+              />
+            ))}
+          </div>
+        );
+      }
+
+      function FloatingEmojiBurst({ floatKey, emojis }) {
+        const items = Array.from({ length: 12 }, (_, index) => ({
+          id: `${floatKey}-${index}`,
+          left: `${10 + Math.random() * 80}%`,
+          size: 24 + Math.random() * 24,
+          delay: Math.random() * 0.7,
+          duration: 2.1 + Math.random() * 1.1,
+          emoji: emojis[index % emojis.length]
+        }));
+
+        return (
+          <div style={{ pointerEvents: "none", position: "fixed", inset: 0, overflow: "hidden", zIndex: 38 }}>
+            {items.map((item) => (
+              <span
+                key={item.id}
+                style={{
+                  position: "absolute",
+                  left: item.left,
+                  bottom: -10,
+                  fontSize: item.size,
+                  animation: `floatUp ${item.duration}s ease-out ${item.delay}s forwards`
+                }}
+              >
+                {item.emoji}
+              </span>
+            ))}
+          </div>
+        );
+      }
+
+      function StarBar({ total, stars, animateIndex }) {
+        return (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {Array.from({ length: total }, (_, index) => {
+              const earned = index < stars;
+              return (
+                <span
+                  key={index}
+                  style={{
+                    fontSize: 28,
+                    filter: earned ? "none" : "grayscale(1)",
+                    opacity: earned ? 1 : 0.3,
+                    display: "inline-block",
+                    animation: animateIndex === index ? "starSpin 0.6s ease" : "none"
+                  }}
+                >
+                  ⭐
+                </span>
+              );
+            })}
+          </div>
+        );
+      }
+
+      function ChineseLessons() {
+        const [lessons, setLessons] = useState(ALL_LESSONS);
+        const [lessonIdx, setLessonIdx] = useState(null);
+        const [screen, setScreen] = useState("menu");
+        const [exIdx, setExIdx] = useState(0);
+        const [blanks, setBlanks] = useState([]);
+        const [wordBank, setWordBank] = useState([]);
+        const [checked, setChecked] = useState(false);
+        const [results, setResults] = useState([]);
+        const [stars, setStars] = useState(0);
+        const [showConfetti, setShowConfetti] = useState(false);
+        const [showFloating, setShowFloating] = useState(false);
+        const [showStar, setShowStar] = useState(false);
+        const [shaking, setShaking] = useState(false);
+        const [wrongFlash, setWrongFlash] = useState(false);
+        const [editorIdx, setEditorIdx] = useState(null);
+        const [editorDraft, setEditorDraft] = useState(null);
+        const [editorTab, setEditorTab] = useState("words");
+        const [jsonText, setJsonText] = useState("");
+        const [jsonError, setJsonError] = useState("");
+        const [feedbackLock, setFeedbackLock] = useState(false);
+        const [confettiKey, setConfettiKey] = useState(0);
+        const [floatKey, setFloatKey] = useState(0);
+
+        const initRef = useRef(null);
+        const timersRef = useRef([]);
+        const lesson = lessonIdx === null ? null : lessons[lessonIdx];
+        const exercises = useMemo(() => (lesson ? lesson.exercises.map((exercise) => ({
+          ...exercise,
+          parsed: parseTemplate(exercise.template)
+        })) : []), [lesson]);
+        const currentExercise = exercises[exIdx] || null;
+        const editorLesson = editorDraft || null;
+        const scorePct = exercises.length ? Math.round((stars / exercises.length) * 100) : 0;
+
+        function clearTimers() {
+          timersRef.current.forEach((timer) => clearTimeout(timer));
+          timersRef.current = [];
+        }
+
+        function addTimer(fn, delay) {
+          const timer = window.setTimeout(fn, delay);
+          timersRef.current.push(timer);
+        }
+
+        useEffect(() => clearTimers, []);
+
+        useEffect(() => {
+          if (screen === "result" && exercises.length && scorePct >= 70) {
+            setConfettiKey((value) => value + 1);
+            setFloatKey((value) => value + 1);
+            setShowConfetti(true);
+            setShowFloating(true);
+            addTimer(() => setShowConfetti(false), 100);
+            addTimer(() => setShowFloating(false), 100);
+          }
+        }, [screen, scorePct, exercises.length]);
+
+        initRef.current = (idx) => {
+          if (!exercises[idx]) {
+            return;
+          }
+
+          clearTimers();
+          const exercise = exercises[idx];
+          const answers = exercise.parsed.answers;
+          const vocabMap = new Map((lesson?.vocabulary || []).map((item) => [item.hanzi, item]));
+          const bankWords = shuffle(Array.from(new Set([...answers, ...exercise.distractors]))).map((hanzi, bankIdx) => {
+            const found = vocabMap.get(hanzi);
+            return found
+              ? { ...found, used: false, bankIdx }
+              : { hanzi, pinyin: "", ru: hanzi, emoji: "✨", used: false, bankIdx };
+          });
+
+          setBlanks(Array(answers.length).fill(null));
+          setWordBank(bankWords);
+          setChecked(false);
+          setResults(Array(answers.length).fill(false));
+          setShaking(false);
+          setWrongFlash(false);
+          setShowStar(false);
+          setFeedbackLock(false);
+        };
+
+        const initExercise = useCallback((idx) => initRef.current(idx), []);
+
+        useEffect(() => {
+          if (screen === "exercise" && exercises.length) {
+            initExercise(exIdx);
+          }
+        }, [screen, exIdx, exercises.length, initExercise]);
+
+        function openLesson(idx) {
+          playClick();
+          clearTimers();
+          setLessonIdx(idx);
+          setExIdx(0);
+          setStars(0);
+          setScreen("vocab");
+        }
+
+        function openEditor(idx, event) {
+          if (event) {
+            event.stopPropagation();
+          }
+          playClick();
+          setEditorIdx(idx);
+          const draft = JSON.parse(JSON.stringify(lessons[idx]));
+          setEditorDraft(draft);
+          setJsonText(lessonToJSON(draft));
+          setJsonError("");
+          setEditorTab("words");
+          setScreen("editor");
+        }
+
+        function createLesson() {
+          playClick();
+          const draft = {
+            id: `lesson_${Date.now()}`,
+            title: "Новый урок",
+            icon: "📖",
+            color: "#888",
+            vocabulary: [],
+            exercises: []
+          };
+          setEditorIdx(null);
+          setEditorDraft(draft);
+          setJsonText(lessonToJSON(draft));
+          setJsonError("");
+          setEditorTab("words");
+          setScreen("editor");
+        }
+
+        function saveEditor() {
+          if (!editorLesson) {
+            return;
+          }
+          playClick();
+          const nextLesson = JSON.parse(JSON.stringify(editorLesson));
+          setLessons((current) => {
+            if (editorIdx === null) {
+              return [...current, nextLesson];
+            }
+            return current.map((lessonItem, index) => (index === editorIdx ? nextLesson : lessonItem));
+          });
+          setScreen("menu");
+          setEditorDraft(null);
+          setEditorIdx(null);
+        }
+
+        function cancelEditor() {
+          playClick();
+          setScreen("menu");
+          setEditorDraft(null);
+          setEditorIdx(null);
+          setJsonError("");
+        }
+
+        function updateDraft(mutator) {
+          setEditorDraft((current) => {
+            const next = JSON.parse(JSON.stringify(current));
+            mutator(next);
+            setJsonText(lessonToJSON(next));
+            return next;
+          });
+        }
+
+        function applyJSON() {
+          playClick();
+          try {
+            const parsed = JSON.parse(jsonText);
+            if (!parsed || typeof parsed !== "object" || !Array.isArray(parsed.vocabulary) || !Array.isArray(parsed.exercises)) {
+              throw new Error("Неверный формат урока.");
+            }
+            setEditorDraft(parsed);
+            setJsonError("");
+          } catch (error) {
+            setJsonError(error.message || "Не удалось разобрать JSON");
+          }
+        }
+
+        function startExercises() {
+          playClick();
+          setExIdx(0);
+          setStars(0);
+          setScreen("exercise");
+        }
+
+        function placeWord(bankIdx) {
+          if (checked) {
+            return;
+          }
+          const blankIndex = blanks.findIndex((item) => item === null);
+          if (blankIndex === -1) {
+            return;
+          }
+          playClick();
+          const picked = wordBank.find((item) => item.bankIdx === bankIdx);
+          if (!picked || picked.used) {
+            return;
+          }
+          setBlanks((current) => current.map((item, index) => (index === blankIndex ? { ...picked } : item)));
+          setWordBank((current) => current.map((item) => (
+            item.bankIdx === bankIdx ? { ...item, used: true } : item
+          )));
+        }
+
+        function removeWord(blankIndex) {
+          if (checked || !blanks[blankIndex]) {
+            return;
+          }
+          playClick();
+          const returning = blanks[blankIndex];
+          setBlanks((current) => current.map((item, index) => (index === blankIndex ? null : item)));
+          setWordBank((current) => current.map((item) => (
+            item.bankIdx === returning.bankIdx ? { ...item, used: false } : item
+          )));
+        }
+
+        function retryExercise() {
+          playClick();
+          initExercise(exIdx);
+        }
+
+        function nextExercise() {
+          playClick();
+          if (exIdx >= exercises.length - 1) {
+            setScreen("result");
+            return;
+          }
+          setExIdx((value) => value + 1);
+        }
+
+        function checkExercise() {
+          if (!currentExercise || checked || blanks.some((item) => !item) || feedbackLock) {
+            return;
+          }
+          setFeedbackLock(true);
+          playClick();
+          const correctness = currentExercise.parsed.answers.map((answer, index) => blanks[index]?.hanzi === answer);
+          const allCorrect = correctness.every(Boolean);
+          setResults(correctness);
+          setChecked(true);
+
+          if (allCorrect) {
+            setStars((value) => value + 1);
+            setShowStar(true);
+            playSuccess();
+            addTimer(() => playStarSparkle(), 500);
+            setConfettiKey((value) => value + 1);
+            setFloatKey((value) => value + 1);
+            setShowConfetti(true);
+            setShowFloating(true);
+            addTimer(() => setShowConfetti(false), 100);
+            addTimer(() => setShowFloating(false), 100);
+          } else {
+            setWrongFlash(true);
+            setShaking(true);
+            playWrong();
+            addTimer(() => setShaking(false), 700);
+            addTimer(() => setWrongFlash(false), 1500);
+          }
+
+          addTimer(() => setFeedbackLock(false), 200);
+        }
+
+        function resetRun() {
+          playClick();
+          clearTimers();
+          setExIdx(0);
+          setStars(0);
+          setLessonIdx(null);
+          setScreen("menu");
+          setBlanks([]);
+          setWordBank([]);
+          setChecked(false);
+          setResults([]);
+          setShowConfetti(false);
+          setShowFloating(false);
+          setShowStar(false);
+          setShaking(false);
+          setWrongFlash(false);
+        }
+
+        const styles = {
+          page: {
+            minHeight: "100vh",
+            padding: 24,
+            background: TOKENS.pageBg,
+            position: "relative",
+            overflow: "hidden"
+          },
+          shell: {
+            maxWidth: 1180,
+            margin: "0 auto",
+            position: "relative"
+          },
+          card: {
+            background: "rgba(255,255,255,0.8)",
+            borderRadius: TOKENS.cardRadius,
+            boxShadow: TOKENS.shadow
+          },
+          h1: {
+            margin: 0,
+            fontSize: 36,
+            fontWeight: 800,
+            color: TOKENS.text
+          },
+          sub: {
+            marginTop: 8,
+            color: TOKENS.gray,
+            fontSize: 16
+          },
+          grid: {
+            display: "grid",
+            gap: 16
+          },
+          lessonGrid: {
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+            gap: 16,
+            marginTop: 24
+          },
+          button: {
+            border: "none",
+            borderRadius: TOKENS.btnRadius,
+            padding: "14px 18px",
+            cursor: "pointer",
+            fontWeight: 700
+          },
+          input: {
+            width: "100%",
+            border: "1px solid #DDD",
+            borderRadius: 12,
+            padding: "12px 14px",
+            outline: "none"
+          }
+        };
+
+        function renderMenu() {
+          return (
+            <div style={styles.page}>
+              <div style={styles.shell}>
+                <div style={{ ...styles.card, padding: 28 }}>
+                  <h1 style={styles.h1}>Учим китайский!</h1>
+                  <div style={styles.sub}>Выбери урок</div>
+
+                  <div style={styles.lessonGrid}>
+                    {lessons.map((lessonItem, index) => (
+                      <div
+                        key={lessonItem.id}
+                        onClick={() => openLesson(index)}
+                        style={{
+                          ...styles.card,
+                          padding: 18,
+                          cursor: "pointer",
+                          borderTop: `4px solid ${lessonItem.color}`,
+                          transition: "transform 0.18s ease, box-shadow 0.18s ease",
+                          animation: `bounceIn 0.5s ease ${index * 0.1}s both`
+                        }}
+                        onMouseEnter={(event) => {
+                          event.currentTarget.style.transform = "scale(1.05)";
+                          event.currentTarget.style.boxShadow = "0 18px 32px rgba(0,0,0,.16)";
+                        }}
+                        onMouseLeave={(event) => {
+                          event.currentTarget.style.transform = "scale(1)";
+                          event.currentTarget.style.boxShadow = TOKENS.shadow;
+                        }}
+                      >
+                        <div style={{ fontSize: 48 }}>{lessonItem.icon}</div>
+                        <div style={{ marginTop: 10, fontWeight: 800, fontSize: 18 }}>{lessonItem.title}</div>
+                        <div style={{ marginTop: 8, color: TOKENS.gray, fontSize: 13 }}>
+                          {lessonItem.vocabulary.length} слов · {lessonItem.exercises.length} заданий
+                        </div>
+                        <button
+                          style={{
+                            ...styles.button,
+                            marginTop: 16,
+                            padding: "8px 12px",
+                            fontSize: 13,
+                            background: "#F1F2F6",
+                            color: TOKENS.gray
+                          }}
+                          onClick={(event) => openEditor(index, event)}
+                        >
+                          Редактировать
+                        </button>
+                      </div>
+                    ))}
+
+                    <div
+                      onClick={createLesson}
+                      style={{
+                        ...styles.card,
+                        minHeight: 210,
+                        display: "grid",
+                        placeItems: "center",
+                        cursor: "pointer",
+                        border: "3px dashed rgba(77,150,255,.35)",
+                        animation: `bounceIn 0.5s ease ${lessons.length * 0.1}s both`
+                      }}
+                    >
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 44 }}>➕</div>
+                        <div style={{ marginTop: 10, fontWeight: 800, fontSize: 18 }}>Новый урок</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        function renderVocab() {
+          return (
+            <div style={styles.page}>
+              <div style={styles.shell}>
+                <button
+                  style={{ ...styles.button, background: "#F1F2F6", color: TOKENS.gray }}
+                  onClick={() => {
+                    playClick();
+                    setScreen("menu");
+                    setLessonIdx(null);
+                  }}
+                >
+                  ← К урокам
+                </button>
+
+                <div style={{ ...styles.card, marginTop: 16, padding: 28 }}>
+                  <div style={{ fontSize: 34 }}>{lesson.icon}</div>
+                  <h1 style={{ ...styles.h1, marginTop: 8 }}>Запомни эти слова!</h1>
+                  <div style={styles.sub}>{lesson.title}</div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+                      gap: 12,
+                      marginTop: 24
+                    }}
+                  >
+                    {lesson.vocabulary.map((word, index) => (
+                      <div
+                        key={word.hanzi}
+                        style={{
+                          background: "linear-gradient(135deg, #667eea, #764ba2)",
+                          color: "white",
+                          borderRadius: 22,
+                          padding: 16,
+                          boxShadow: "0 14px 28px rgba(102,126,234,.25)",
+                          animation: `bounceIn 0.45s ease ${index * 0.08}s both`,
+                          transformOrigin: "center"
+                        }}
+                        onMouseEnter={(event) => {
+                          event.currentTarget.style.transform = "scale(1.05)";
+                        }}
+                        onMouseLeave={(event) => {
+                          event.currentTarget.style.transform = "scale(1)";
+                        }}
+                      >
+                        <div style={{ fontSize: 36 }}>{word.emoji}</div>
+                        <div style={{ marginTop: 8, fontSize: 28, fontWeight: 800 }}>{word.hanzi}</div>
+                        <div style={{ marginTop: 4, fontSize: 13, opacity: 0.82 }}>{word.pinyin}</div>
+                        <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "6px 10px",
+                              borderRadius: 999,
+                              background: "rgba(255,255,255,.2)",
+                              fontSize: 13
+                            }}
+                          >
+                            {word.ru}
+                          </span>
+                          <SpeakBtn text={word.hanzi} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    style={{
+                      ...styles.button,
+                      marginTop: 24,
+                      background: TOKENS.green,
+                      color: "white"
+                    }}
+                    onClick={startExercises}
+                  >
+                    К упражнениям!
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        function renderExercise() {
+          const allFilled = blanks.length && blanks.every(Boolean);
+          const answers = currentExercise?.parsed.answers || [];
+          const answerMeta = answers.map((answer) => lesson.vocabulary.find((item) => item.hanzi === answer) || { hanzi: answer, pinyin: "" });
+
+          return (
+            <div style={styles.page}>
+              {showConfetti && <ConfettiBurst burstKey={confettiKey} />}
+              {showFloating && <FloatingEmojiBurst floatKey={floatKey} emojis={["⭐", "✨", "🎉"]} />}
+              <div style={styles.shell}>
+                <button
+                  style={{ ...styles.button, background: "#F1F2F6", color: TOKENS.gray }}
+                  onClick={() => {
+                    playClick();
+                    setScreen("vocab");
+                  }}
+                >
+                  ← К словам
+                </button>
+
+                <div
+                  style={{
+                    ...styles.card,
+                    marginTop: 16,
+                    padding: 28,
+                    background: wrongFlash
+                      ? "linear-gradient(135deg, #FFE0E0, #FFD2D2, #FFF)"
+                      : "rgba(255,255,255,0.88)",
+                    boxShadow: checked && results.every(Boolean)
+                      ? "0 0 40px rgba(107,203,119,.4)"
+                      : TOKENS.shadow,
+                    animation: shaking ? "shakeX 0.6s ease" : "none",
+                    transition: "background 0.2s ease, box-shadow 0.2s ease"
+                  }}
+                >
+                  <StarBar total={exercises.length} stars={stars} animateIndex={showStar ? stars - 1 : null} />
+
+                  <div style={{ marginTop: 18 }}>
+                    <div style={{ fontWeight: 700, color: TOKENS.gray }}>
+                      Предложение {exIdx + 1} из {exercises.length}
+                    </div>
+                    <div
+                      style={{
+                        marginTop: 8,
+                        width: "100%",
+                        height: 8,
+                        background: "rgba(0,0,0,.08)",
+                        borderRadius: 999,
+                        overflow: "hidden"
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${((exIdx + 1) / exercises.length) * 100}%`,
+                          height: "100%",
+                          background: "linear-gradient(90deg, #FFD93D, #FF6B6B)"
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: 18,
+                      borderRadius: 20,
+                      background: "#FFF9E6",
+                      border: "1px solid #FFE0A0",
+                      padding: 16,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      flexWrap: "wrap"
+                    }}
+                  >
+                    <span style={{ fontSize: 24 }}>💡</span>
+                    <span style={{ fontWeight: 700 }}>{currentExercise.hint}</span>
+                    <SpeakBtn text={currentExercise.full} />
+                  </div>
+
+                  <div style={{ marginTop: 26, fontSize: 26, lineHeight: 2 }}>
+                    {currentExercise.parsed.parts.map((part, index) => {
+                      if (part !== null) {
+                        return <span key={`part-${index}`}>{part}</span>;
+                      }
+
+                      const blankIndex = Math.floor(index / 2);
+                      const filled = blanks[blankIndex];
+                      const checkedState = checked ? results[blankIndex] : null;
+
+                      return (
+                        <span
+                          key={`blank-${blankIndex}`}
+                          onClick={() => filled && removeWord(blankIndex)}
+                          style={{
+                            display: "inline-block",
+                            minWidth: 92,
+                            margin: "0 6px",
+                            padding: filled ? "8px 10px 6px" : "6px 8px",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                            borderRadius: 14,
+                            cursor: filled && !checked ? "pointer" : "default",
+                            borderBottom: filled ? "none" : "3px dashed rgba(45,52,54,.26)",
+                            background: !filled
+                              ? "transparent"
+                              : checkedState === true
+                              ? "#C8F7C5"
+                              : checkedState === false
+                              ? "#FFB8B8"
+                              : "#E8F4FD",
+                            boxShadow: checkedState === true
+                              ? "0 0 20px rgba(107,203,119,.35)"
+                              : checkedState === false
+                              ? "0 0 20px rgba(255,107,107,.25)"
+                              : "none",
+                            animation: checkedState === true
+                              ? "blankPop 0.4s ease"
+                              : checkedState === false
+                              ? "blankWrong 0.4s ease"
+                              : "none"
+                          }}
+                        >
+                          {!filled ? (
+                            <span style={{ opacity: 0.3 }}>___</span>
+                          ) : (
+                            <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                              <span style={{ fontWeight: 800 }}>{filled.hanzi}</span>
+                              <span style={{ fontSize: 12, color: TOKENS.gray }}>{filled.pinyin}</span>
+                              <SpeakBtn text={filled.hanzi} small={true} />
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })}
+                  </div>
+
+                  {checked && (
+                    <div
+                      style={{
+                        marginTop: 20,
+                        borderRadius: 20,
+                        padding: 16,
+                        animation: "bounceIn 0.45s ease",
+                        background: results.every(Boolean)
+                          ? "linear-gradient(135deg, #D8F9DD, #B8F2C0)"
+                          : "linear-gradient(135deg, #FFD9D9, #FFBABA)"
+                      }}
+                    >
+                      {results.every(Boolean) ? (
+                        <div style={{ fontWeight: 800, fontSize: 18 }}>🎉 Отлично! +1 ⭐</div>
+                      ) : (
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: 18 }}>😿 Не совсем...</div>
+                          <div style={{ marginTop: 8, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                            {answerMeta.map((item) => (
+                              <div
+                                key={item.hanzi}
+                                style={{
+                                  padding: "8px 10px",
+                                  borderRadius: 14,
+                                  background: "rgba(255,255,255,.55)",
+                                  fontSize: 14
+                                }}
+                              >
+                                {item.hanzi} <span style={{ color: TOKENS.gray }}>{item.pinyin}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {!checked && (
+                    <div style={{ marginTop: 20, display: "flex", flexWrap: "wrap", gap: 12 }}>
+                      {wordBank.map((item) => (
+                        <button
+                          key={item.bankIdx}
+                          disabled={item.used}
+                          onClick={() => placeWord(item.bankIdx)}
+                          style={{
+                            ...styles.button,
+                            padding: "10px 12px",
+                            borderRadius: TOKENS.chipRadius,
+                            background: item.used ? "#E0E0E0" : TOKENS.blue,
+                            color: "white",
+                            opacity: item.used ? 0.4 : 1,
+                            boxShadow: item.used ? "none" : "0 10px 18px rgba(77,150,255,.3)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 8
+                          }}
+                        >
+                          <span>
+                            <strong>{item.hanzi}</strong>{" "}
+                            <span style={{ opacity: 0.82, fontSize: 12 }}>{item.pinyin}</span>
+                          </span>
+                          <SpeakBtn text={item.hanzi} small={true} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div style={{ marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    {!checked && (
+                      <button
+                        onClick={checkExercise}
+                        disabled={!allFilled}
+                        style={{
+                          ...styles.button,
+                          background: allFilled ? TOKENS.green : "#DADADA",
+                          color: allFilled ? "white" : "#666",
+                          cursor: allFilled ? "pointer" : "not-allowed"
+                        }}
+                      >
+                        Проверить
+                      </button>
+                    )}
+
+                    {checked && !results.every(Boolean) && (
+                      <button
+                        onClick={retryExercise}
+                        style={{ ...styles.button, background: TOKENS.yellow, color: TOKENS.text }}
+                      >
+                        Попробовать ещё раз
+                      </button>
+                    )}
+
+                    {checked && (
+                      <button
+                        onClick={nextExercise}
+                        style={{ ...styles.button, background: TOKENS.blue, color: "white" }}
+                      >
+                        {exIdx === exercises.length - 1 ? "Результаты" : "Дальше"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        function renderResult() {
+          const tier =
+            scorePct === 100
+              ? { emoji: "🏆", text: "Превосходно! Все ответы правильные!" }
+              : scorePct >= 70
+              ? { emoji: "🌟", text: "Отличная работа!" }
+              : scorePct >= 40
+              ? { emoji: "💪", text: "Хорошее начало! Попробуй ещё раз!" }
+              : { emoji: "📚", text: "Не расстраивайся! Повтори слова!" };
+
+          return (
+            <div style={styles.page}>
+              {showConfetti && <ConfettiBurst burstKey={confettiKey} />}
+              {showFloating && <FloatingEmojiBurst floatKey={floatKey} emojis={["⭐", "🌟", "🏆", "🎉"]} />}
+              <div style={styles.shell}>
+                <div style={{ ...styles.card, padding: 30, textAlign: "center" }}>
+                  <div style={{ fontSize: 72 }}>{tier.emoji}</div>
+                  <h1 style={{ ...styles.h1, marginTop: 10 }}>Результаты</h1>
+                  <div style={{ ...styles.sub, fontSize: 18, marginTop: 10 }}>{tier.text}</div>
+
+                  <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+                      {Array.from({ length: exercises.length }, (_, index) => (
+                        <span
+                          key={index}
+                          style={{
+                            fontSize: 48,
+                            display: "inline-block",
+                            filter: index < stars ? "none" : "grayscale(1)",
+                            opacity: index < stars ? 1 : 0.28,
+                            animation: index < stars ? `starSpin 0.6s ease ${index * 0.08}s both` : "none"
+                          }}
+                        >
+                          ⭐
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: 18, fontWeight: 800, fontSize: 22 }}>
+                    {stars} из {exercises.length} звёзд
+                  </div>
+
+                  <div style={{ marginTop: 26, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => {
+                        playClick();
+                        setExIdx(0);
+                        setStars(0);
+                        setScreen("vocab");
+                      }}
+                      style={{ ...styles.button, background: TOKENS.green, color: "white" }}
+                    >
+                      Пройти ещё раз
+                    </button>
+                    <button
+                      onClick={resetRun}
+                      style={{ ...styles.button, background: TOKENS.blue, color: "white" }}
+                    >
+                      К урокам
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        function renderEditor() {
+          const draft = editorLesson;
+
+          return (
+            <div style={styles.page}>
+              <div style={styles.shell}>
+                <div style={{ ...styles.card, padding: 24 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                    <div>
+                      <h1 style={styles.h1}>Редактор урока</h1>
+                      <div style={styles.sub}>Измени слова, упражнения или JSON</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      <button onClick={saveEditor} style={{ ...styles.button, background: TOKENS.green, color: "white" }}>
+                        Сохранить
+                      </button>
+                      <button onClick={cancelEditor} style={{ ...styles.button, background: "#F1F2F6", color: TOKENS.gray }}>
+                        Отмена
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 90px", gap: 12, marginTop: 18 }}>
+                    <input
+                      value={draft.title}
+                      onChange={(event) => updateDraft((next) => { next.title = event.target.value; })}
+                      placeholder="Название урока"
+                      style={styles.input}
+                    />
+                    <input
+                      value={draft.icon}
+                      onChange={(event) => updateDraft((next) => { next.icon = event.target.value; })}
+                      placeholder="📖"
+                      style={styles.input}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
+                    {[
+                      ["words", "Слова"],
+                      ["exercises", "Предложения"],
+                      ["json", "JSON"]
+                    ].map(([id, label]) => (
+                      <button
+                        key={id}
+                        onClick={() => {
+                          playClick();
+                          setEditorTab(id);
+                          setJsonText(lessonToJSON(editorLesson));
+                        }}
+                        style={{
+                          ...styles.button,
+                          padding: "10px 14px",
+                          background: editorTab === id ? TOKENS.blue : "#F1F2F6",
+                          color: editorTab === id ? "white" : TOKENS.gray
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {editorTab === "words" && (
+                    <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
+                      {draft.vocabulary.map((word, index) => (
+                        <div
+                          key={`${word.hanzi}-${index}`}
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "48px 72px 90px 1fr 44px",
+                            gap: 10,
+                            alignItems: "center"
+                          }}
+                        >
+                          <input
+                            value={word.emoji}
+                            onChange={(event) => updateDraft((next) => { next.vocabulary[index].emoji = event.target.value; })}
+                            style={{ ...styles.input, textAlign: "center" }}
+                          />
+                          <input
+                            value={word.hanzi}
+                            onChange={(event) => updateDraft((next) => { next.vocabulary[index].hanzi = event.target.value; })}
+                            style={styles.input}
+                          />
+                          <input
+                            value={word.pinyin}
+                            onChange={(event) => updateDraft((next) => { next.vocabulary[index].pinyin = event.target.value; })}
+                            style={styles.input}
+                          />
+                          <input
+                            value={word.ru}
+                            onChange={(event) => updateDraft((next) => { next.vocabulary[index].ru = event.target.value; })}
+                            style={styles.input}
+                          />
+                          <button
+                            onClick={() => updateDraft((next) => { next.vocabulary.splice(index, 1); })}
+                            style={{ ...styles.button, background: TOKENS.red, color: "white", padding: "12px 0" }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => updateDraft((next) => {
+                          next.vocabulary.push({ hanzi: "", pinyin: "", ru: "", emoji: "✨" });
+                        })}
+                        style={{ ...styles.button, background: "#F1F2F6", color: TOKENS.gray, marginTop: 10 }}
+                      >
+                        + Добавить слово
+                      </button>
+                    </div>
+                  )}
+
+                  {editorTab === "exercises" && (
+                    <div style={{ marginTop: 18, display: "grid", gap: 14 }}>
+                      {draft.exercises.map((exercise, index) => (
+                        <div key={index} style={{ ...styles.card, padding: 16, background: "#FAFAFF" }}>
+                          <div style={{ display: "grid", gap: 10 }}>
+                            <input
+                              value={exercise.hint}
+                              onChange={(event) => updateDraft((next) => { next.exercises[index].hint = event.target.value; })}
+                              placeholder="Подсказка"
+                              style={styles.input}
+                            />
+                            <input
+                              value={exercise.template}
+                              onChange={(event) => updateDraft((next) => { next.exercises[index].template = event.target.value; })}
+                              placeholder="Шаблон"
+                              style={styles.input}
+                            />
+                            <input
+                              value={exercise.full}
+                              onChange={(event) => updateDraft((next) => { next.exercises[index].full = event.target.value; })}
+                              placeholder="Полное предложение"
+                              style={styles.input}
+                            />
+                            <input
+                              value={exercise.distractors.join(", ")}
+                              onChange={(event) => updateDraft((next) => {
+                                next.exercises[index].distractors = event.target.value
+                                  .split(",")
+                                  .map((item) => item.trim())
+                                  .filter(Boolean);
+                              })}
+                              placeholder="Обманки"
+                              style={styles.input}
+                            />
+                            <button
+                              onClick={() => updateDraft((next) => { next.exercises.splice(index, 1); })}
+                              style={{ ...styles.button, background: TOKENS.red, color: "white" }}
+                            >
+                              Удалить предложение
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => updateDraft((next) => {
+                          next.exercises.push({ hint: "", full: "", template: "", distractors: [] });
+                        })}
+                        style={{ ...styles.button, background: "#F1F2F6", color: TOKENS.gray }}
+                      >
+                        + Добавить предложение
+                      </button>
+                    </div>
+                  )}
+
+                  {editorTab === "json" && (
+                    <div style={{ marginTop: 18 }}>
+                      <textarea
+                        value={jsonText}
+                        onChange={(event) => setJsonText(event.target.value)}
+                        style={{ ...styles.input, minHeight: 360, fontFamily: "ui-monospace, SFMono-Regular, monospace" }}
+                      />
+                      {jsonError && <div style={{ marginTop: 10, color: TOKENS.red, fontWeight: 700 }}>{jsonError}</div>}
+                      <button
+                        onClick={applyJSON}
+                        style={{ ...styles.button, marginTop: 12, background: TOKENS.blue, color: "white" }}
+                      >
+                        Применить JSON
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (screen === "menu") {
+          return renderMenu();
+        }
+
+        if (screen === "vocab") {
+          return renderVocab();
+        }
+
+        if (screen === "exercise") {
+          return renderExercise();
+        }
+
+        if (screen === "result") {
+          return renderResult();
+        }
+
+        if (screen === "editor" && editorLesson) {
+          return renderEditor();
+        }
+
+        return null;
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<ChineseLessons />);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "id": "food",
+  "title": "Еда 食物",
+  "icon": "🍚",
+  "color": "#FF6B6B",
+  "vocabulary": [
+    {
+      "hanzi": "米饭",
+      "pinyin": "mǐfàn",
+      "ru": "рис",
+      "emoji": "🍚"
+    },
+    {
+      "hanzi": "鱼",
+      "pinyin": "yú",
+      "ru": "рыба",
+      "emoji": "🐟"
+    }
+  ],
+  "exercises": [
+    {
+      "hint": "Я люблю есть рис и рыбу.",
+      "full": "我喜欢吃米饭和鱼。",
+      "template": "我喜欢吃{米饭}和{鱼}。",
+      "distractors": ["水", "汤"]
+    }
+  ]
+}
