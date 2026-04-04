@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Food Quest CN — детский урок китайского</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="topbar glass">
+      <div>
+        <p class="eyebrow">Урок 1 · Тема: Еда</p>
+        <h1>🐼 Food Quest CN</h1>
+      </div>
+      <div class="hud">
+        <div class="pill">⭐ <strong id="starCount">0</strong></div>
+        <div class="pill">🏅 <strong id="badgeCount">0</strong></div>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="lesson-map glass">
+        <h2>Маршрут</h2>
+        <ol>
+          <li id="step-0" class="active">Старт</li>
+          <li id="step-1">Слова дня</li>
+          <li id="step-2">Выбор перевода</li>
+          <li id="step-3">Вставь слова</li>
+          <li id="step-4">Финал</li>
+        </ol>
+        <div class="progress-wrap">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+      </aside>
+
+      <section class="stage glass">
+        <section id="startScreen" class="screen active">
+          <h2>Привет, герой!</h2>
+          <p>Тебя ждут карточки, мини-игры и призы. Готов собрать все звёзды?</p>
+          <button id="startLessonBtn" class="btn btn-primary">Начать приключение</button>
+        </section>
+
+        <section id="wordsScreen" class="screen hidden">
+          <h2>Слова дня</h2>
+          <p class="muted">Нажимай на карточку, чтобы послушать произношение.</p>
+          <div id="wordGrid" class="word-grid"></div>
+          <button id="toQuizBtn" class="btn btn-primary">Дальше: игра «1 из 3»</button>
+        </section>
+
+        <section id="quizScreen" class="screen hidden">
+          <h2>Выбери правильный перевод</h2>
+          <p id="quizPrompt" class="prompt"></p>
+          <div id="quizOptions" class="options"></div>
+          <p id="quizFeedback" class="feedback"></p>
+        </section>
+
+        <section id="fillScreen" class="screen hidden">
+          <h2>Вставь слова в предложение</h2>
+          <p class="muted">Можно вставлять 1, 2 или 3 слова — как в настоящем уроке!</p>
+          <div id="fillContainer"></div>
+          <button id="checkFillBtn" class="btn btn-primary">Проверить ответы</button>
+          <p id="fillFeedback" class="feedback"></p>
+        </section>
+
+        <section id="resultScreen" class="screen hidden">
+          <h2>Урок завершён! 🎉</h2>
+          <p id="resultText"></p>
+          <button id="restartBtn" class="btn btn-primary">Играть снова</button>
+        </section>
+      </section>
+    </main>
+
+    <div id="rewardToast" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
