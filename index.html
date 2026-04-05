@@ -978,6 +978,12 @@
           )));
         }
 
+        useEffect(() => {
+          if (!checked && !feedbackLock && blanks.length > 0 && blanks.every(Boolean)) {
+            checkExercise();
+          }
+        }, [blanks, checked, feedbackLock]);
+
         function removeWord(blankIndex) {
           if (checked || !blanks[blankIndex]) {
             return;
@@ -1499,21 +1505,6 @@
                   )}
 
                   <div style={{ marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    {!checked && (
-                      <button
-                        onClick={checkExercise}
-                        disabled={!allFilled}
-                        style={{
-                          ...styles.button,
-                          background: allFilled ? TOKENS.green : "#DADADA",
-                          color: allFilled ? "white" : "#666",
-                          cursor: allFilled ? "pointer" : "not-allowed"
-                        }}
-                      >
-                        Проверить
-                      </button>
-                    )}
-
                     {checked && !results.every(Boolean) && (
                       <button
                         onClick={retryExercise}
