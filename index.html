@@ -165,8 +165,20 @@
           icon: "🍚",
           color: "#FF6B6B",
           vocabulary: [
-            { hanzi: "米饭", pinyin: "mǐfàn", ru: "рис", emoji: "🍚" },
-            { hanzi: "鸡蛋", pinyin: "jīdàn", ru: "яйцо", emoji: "🥚" },
+            {
+              hanzi: "米饭",
+              pinyin: "mǐfàn",
+              ru: "рис",
+              emoji: "🍚",
+              image: "assets/funny-candidates/rice.png"
+            },
+            {
+              hanzi: "鸡蛋",
+              pinyin: "jīdàn",
+              ru: "яйцо",
+              emoji: "🥚",
+              image: "assets/funny-candidates/egg.png"
+            },
             {
               hanzi: "苹果",
               pinyin: "píngguǒ",
@@ -181,8 +193,20 @@
               emoji: "🥛",
               image: "assets/funny-candidates/milk-alt.png"
             },
-            { hanzi: "面包", pinyin: "miànbāo", ru: "хлеб", emoji: "🍞" },
-            { hanzi: "鱼", pinyin: "yú", ru: "рыба", emoji: "🐟" },
+            {
+              hanzi: "面包",
+              pinyin: "miànbāo",
+              ru: "хлеб",
+              emoji: "🍞",
+              image: "assets/funny-candidates/bread.png"
+            },
+            {
+              hanzi: "鱼",
+              pinyin: "yú",
+              ru: "рыба",
+              emoji: "🐟",
+              image: "assets/funny-candidates/fish.png"
+            },
             {
               hanzi: "水",
               pinyin: "shuǐ",
@@ -190,9 +214,27 @@
               emoji: "💧",
               image: "assets/funny-candidates/water.png"
             },
-            { hanzi: "汤", pinyin: "tāng", ru: "суп", emoji: "🍲" },
-            { hanzi: "肉", pinyin: "ròu", ru: "мясо", emoji: "🍖" },
-            { hanzi: "蔬菜", pinyin: "shūcài", ru: "овощи", emoji: "🥦" }
+            {
+              hanzi: "汤",
+              pinyin: "tāng",
+              ru: "суп",
+              emoji: "🍲",
+              image: "assets/funny-candidates/soup.png"
+            },
+            {
+              hanzi: "肉",
+              pinyin: "ròu",
+              ru: "мясо",
+              emoji: "🍖",
+              image: "assets/funny-candidates/meat.jpg"
+            },
+            {
+              hanzi: "蔬菜",
+              pinyin: "shūcài",
+              ru: "овощи",
+              emoji: "🥦",
+              image: "assets/funny-candidates/vegetables.png"
+            }
           ],
           exercises: [
             {
@@ -1181,7 +1223,9 @@
                           padding: 16,
                           boxShadow: "0 14px 28px rgba(102,126,234,.25)",
                           animation: `bounceIn 0.45s ease ${index * 0.08}s both`,
-                          transformOrigin: "center"
+                          transformOrigin: "center",
+                          display: "flex",
+                          flexDirection: "column"
                         }}
                         onMouseEnter={(event) => {
                           event.currentTarget.style.transform = "scale(1.05)";
@@ -1193,10 +1237,11 @@
                         {word.image ? (
                           <div
                             style={{
-                              height: 74,
+                              height: 128,
                               display: "flex",
                               alignItems: "center",
-                              justifyContent: "center"
+                              justifyContent: "center",
+                              marginBottom: 6
                             }}
                           >
                             <img
@@ -1204,9 +1249,9 @@
                               alt={word.ru}
                               style={{
                                 maxWidth: "100%",
-                                maxHeight: 74,
+                                maxHeight: 128,
                                 objectFit: "contain",
-                                borderRadius: 12
+                                borderRadius: 16
                               }}
                             />
                           </div>
