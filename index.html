@@ -792,6 +792,7 @@
         const [jsonText, setJsonText] = useState("");
         const [jsonError, setJsonError] = useState("");
         const [feedbackLock, setFeedbackLock] = useState(false);
+        const [wrongAttempts, setWrongAttempts] = useState(0);
         const [confettiKey, setConfettiKey] = useState(0);
         const [floatKey, setFloatKey] = useState(0);
 
@@ -829,7 +830,7 @@
           }
         }, [screen, scorePct, exercises.length]);
 
-        initRef.current = (idx) => {
+        initRef.current = (idx, resetAttempts = true) => {
           if (!exercises[idx]) {
             return;
           }
@@ -853,9 +854,12 @@
           setWrongFlash(false);
           setShowStar(false);
           setFeedbackLock(false);
+          if (resetAttempts) {
+            setWrongAttempts(0);
+          }
         };
 
-        const initExercise = useCallback((idx) => initRef.current(idx), []);
+        const initExercise = useCallback((idx, resetAttempts = true) => initRef.current(idx, resetAttempts), []);
 
         useEffect(() => {
           if (screen === "exercise" && exercises.length) {
@@ -998,7 +1002,7 @@
 
         function retryExercise() {
           playClick();
-          initExercise(exIdx);
+          initExercise(exIdx, false);
         }
 
         function nextExercise() {
@@ -1033,6 +1037,7 @@
             addTimer(() => setShowConfetti(false), 100);
             addTimer(() => setShowFloating(false), 100);
           } else {
+            setWrongAttempts((value) => value + 1);
             setWrongFlash(true);
             setShaking(true);
             playWrong();
@@ -1305,6 +1310,7 @@
           const allFilled = blanks.length && blanks.every(Boolean);
           const answers = currentExercise?.parsed.answers || [];
           const answerMeta = answers.map((answer) => lesson.vocabulary.find((item) => item.hanzi === answer) || { hanzi: answer, pinyin: "" });
+          const showHintAfterWrong = wrongAttempts >= 3;
 
           return (
             <div style={styles.page}>
@@ -1454,21 +1460,26 @@
                       ) : (
                         <div>
                           <div style={{ fontWeight: 800, fontSize: 18 }}>😿 Не совсем...</div>
-                          <div style={{ marginTop: 8, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                            {answerMeta.map((item) => (
-                              <div
-                                key={item.hanzi}
-                                style={{
-                                  padding: "8px 10px",
-                                  borderRadius: 14,
-                                  background: "rgba(255,255,255,.55)",
-                                  fontSize: 14
-                                }}
-                              >
-                                {item.hanzi} <span style={{ color: TOKENS.gray }}>{item.pinyin}</span>
-                              </div>
-                            ))}
+                          <div style={{ marginTop: 8, fontSize: 15 }}>
+                            {showHintAfterWrong ? "Вот подсказка, попробуй ещё раз." : "Попробуй ещё раз без подсказки."}
                           </div>
+                          {showHintAfterWrong && (
+                            <div style={{ marginTop: 8, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                              {answerMeta.map((item) => (
+                                <div
+                                  key={item.hanzi}
+                                  style={{
+                                    padding: "8px 10px",
+                                    borderRadius: 14,
+                                    background: "rgba(255,255,255,.55)",
+                                    fontSize: 14
+                                  }}
+                                >
+                                  {item.hanzi} <span style={{ color: TOKENS.gray }}>{item.pinyin}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
